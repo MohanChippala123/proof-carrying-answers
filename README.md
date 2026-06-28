@@ -50,8 +50,18 @@ Q4) via `llama-cpp-python`. It runs in ~8 GB RAM / 8 vCPU — sized for a Railwa
 box. It is used to generate answers and to produce cleaner, pronoun-resolved
 claims. The app runs **fully offline** without it — the deterministic verifier is
 the core contribution, and the model is *never trusted*: every claim it emits is
-verified against evidence before it can enter the final answer. Config lives in
-[`.env.example`](.env.example).
+verified against evidence before it can enter the final answer.
+
+Configuration (all optional — sensible defaults shown):
+
+| Env var | Default | Purpose |
+|---|---|---|
+| `ENABLE_LOCAL_LLM` | _(off)_ | `1` turns the local model on |
+| `LOCAL_MODEL_REPO` | `Qwen/Qwen2.5-1.5B-Instruct-GGUF` | HF repo with the GGUF |
+| `LOCAL_MODEL_FILE` | `qwen2.5-1.5b-instruct-q4_k_m.gguf` | GGUF filename |
+| `MODEL_N_CTX` | `4096` | context window |
+| `MODEL_N_THREADS` | _(all cores)_ | CPU threads |
+| `HF_HOME` | _(default cache)_ | point at a volume to persist the GGUF |
 
 > The design point: a small, cheap, hallucination-prone model becomes
 > *trustworthy* when wrapped in verification. That's the whole thesis, made
@@ -64,8 +74,8 @@ verified against evidence before it can enter the final answer. Config lives in
    [`Procfile`](Procfile) (`gunicorn`, 1 worker so one model copy fits in RAM).
    The `--extra-index-url` in `requirements.txt` pulls **prebuilt CPU wheels** for
    `llama-cpp-python`, so nothing compiles on the box.
-3. Set service variables (see `.env.example`): `ENABLE_LOCAL_LLM=1`, optionally
-   `MODEL_N_THREADS=8`. Railway injects `PORT` automatically.
+3. Set service variables (see the config table above): `ENABLE_LOCAL_LLM=1`,
+   optionally `MODEL_N_THREADS=8`. Railway injects `PORT` automatically.
 4. The model downloads (~1 GB) on first boot; `warmup()` starts it in the
    background so the deterministic verifier is usable immediately and the model
    comes online shortly after. To avoid re-downloading on every restart, mount a
@@ -97,7 +107,7 @@ deterministic verifier — the model imports are guarded.
 - `local_model.py` — optional CPU-only small-model backend (llama-cpp-python).
 - `llm.py` — generator interface over the local model (graceful fallback).
 - `app.py` — Flask API (local: port 5070; Railway: `$PORT`).
-- `Procfile`, `.env.example` — Railway deployment.
+- `Procfile` — Railway deployment.
 - `static/` — single-page verification UI.
 - `MOONSHOT.md` — the Moonshot paper.
 
@@ -123,7 +133,7 @@ re-checks independently.
 | `corpus.py` | Evidence corpus + demo answers (true / false / unsupported mix) |
 | `local_model.py` | CPU-only small-model backend (Qwen2.5-1.5B, GGUF) |
 | `llm.py` | Generator interface over the local model (decompose / answer) |
-| `Procfile`, `.env.example` | Railway deployment config |
+| `Procfile` | Railway deployment config |
 | `app.py` | Flask backend / JSON API |
 | `static/` | UI |
 | `MOONSHOT.md` | The Moonshot paper |

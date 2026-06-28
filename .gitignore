@@ -1,6 +1,9 @@
 __pycache__/
 *.pyc
 .env
+.env.*
+# Local editor / tooling config — not part of the project
+.claude/
 # Local model cache (GGUF files are large — never commit them)
 *.gguf
 .cache/
