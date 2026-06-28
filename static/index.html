@@ -3,17 +3,25 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Proof-Carrying Answers — verifiable AI</title>
+<title>Proof-Carrying Answers - verifiable AI</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <header class="hero">
   <div class="wrap">
-    <div class="mark">PROOF-CARRYING ANSWERS</div>
-    <h1>AI that ships a <em>receipt</em> for every claim.</h1>
+    <nav class="topbar" aria-label="Project">
+      <div class="brand">
+        <span class="brand-mark">PCA</span>
+        <span>Proof-Carrying Answers</span>
+      </div>
+      <div class="nav-note">claim-level verification</div>
+    </nav>
+
+    <div class="eyebrow">Evidence-bound answers</div>
+    <h1>Make every answer bring its working papers.</h1>
     <p class="lede">
       We have spent years trying to make models hallucinate <em>less</em>. That's
-      the wrong target — you can't prove a black box won't lie. So stop trusting
+      the wrong target. You can't prove a black box won't lie. So stop trusting
       the generator and <strong>verify the output</strong>: decompose every answer
       into atomic claims, bind each to retrieved evidence, and attach a
       machine-checkable proof. Claims that can't be supported are
@@ -24,11 +32,14 @@
 </header>
 
 <main class="wrap">
-  <section class="panel">
-    <h2><span class="num">01</span> Verify an answer</h2>
-    <p class="sub">Paste a question and a candidate answer — or load a demo with a
-      planted falsehood. Every claim is checked against the evidence corpus and
-      labelled. Watch the verifier strike the lie in real time.</p>
+  <section class="workspace-panel">
+    <div class="section-heading">
+      <p class="kicker">01 / Workbench</p>
+      <h2>Verify an answer</h2>
+      <p class="sub">Paste a question and a candidate answer, or load a demo with a
+        planted falsehood. Every claim is checked against the evidence corpus and
+        labelled.</p>
+    </div>
 
     <div id="demos" class="demos"></div>
 
@@ -39,7 +50,7 @@
     <textarea id="answer" rows="4" placeholder="Paste an AI answer here..."></textarea>
 
     <div class="actions">
-      <button id="verify" class="primary">Verify &amp; build proof</button>
+      <button id="verify" class="primary">Verify proof</button>
       <label class="toggle"><input type="checkbox" id="usellm" /> Use Claude to decompose claims</label>
       <span id="vstatus" class="status"></span>
     </div>
@@ -47,13 +58,16 @@
     <div id="result" class="result hidden"></div>
   </section>
 
-  <section class="panel thesis">
-    <h2><span class="num">02</span> Why this is zero-to-one</h2>
+  <section class="thesis">
+    <div class="section-heading compact">
+      <p class="kicker">02 / Thesis</p>
+      <h2>Why this is zero-to-one</h2>
+    </div>
     <div class="cols">
       <div>
         <h4>The inherited assumption</h4>
         <p>That the fix for AI lying is a more truthful model. But truthfulness is
-          a property of a black box you cannot inspect — there is no proof to
+          a property of a black box you cannot inspect. There is no proof to
           attach, only a probability to hope on.</p>
       </div>
       <div>
@@ -65,8 +79,8 @@
       </div>
       <div>
         <h4>If it succeeds</h4>
-        <p>AI becomes admissible where it currently can't go — medicine, law,
-          finance, science — because every claim arrives with a citation and a
+        <p>AI becomes admissible where it currently can't go: medicine, law,
+          finance, science. Every claim arrives with a citation and a
           verdict. Verifiability becomes a hard requirement, the way HTTPS did.</p>
       </div>
     </div>
@@ -74,10 +88,9 @@
 </main>
 
 <footer class="wrap">
-  <p>Proof-Carrying Answers · decomposition + TF-IDF retrieval + subject/predicate
+  <p>Proof-Carrying Answers / decomposition + TF-IDF retrieval + subject/predicate
     entailment, implemented from first principles. Every verdict re-checks
-    independently. Optional Claude (claude-opus-4-8) layer for cleaner claim
-    extraction.</p>
+    independently. Optional Claude layer for cleaner claim extraction.</p>
 </footer>
 
 <script src="app.js"></script>

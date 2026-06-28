@@ -1,4 +1,4 @@
-// Proof-Carrying Answers — front-end. Talks to the Flask verification API.
+// Front-end for the proof verification workbench.
 
 const $ = (s, r = document) => r.querySelector(s);
 const api = (p, opts) => fetch(p, opts).then(r => r.json());
@@ -6,19 +6,19 @@ const api = (p, opts) => fetch(p, opts).then(r => r.json());
 async function loadStatus() {
   const s = await api("/api/status");
   const ms = s.model_state || { enabled: false, state: "disabled" };
-  const corpus = ` · corpus: ${s.corpus_docs} sources, ${s.corpus_sentences} evidence sentences`;
+  const corpus = ` / corpus: ${s.corpus_docs} sources, ${s.corpus_sentences} evidence sentences`;
 
   let dot = "off", msg;
   if (!ms.enabled) {
-    msg = "Offline mode — deterministic verifier (no model needed)";
+    msg = "Offline mode / deterministic verifier";
   } else if (ms.state === "ready") {
     dot = "on";
-    msg = `Local model ready — ${ms.model}`;
+    msg = `Local model ready / ${ms.model}`;
   } else if (ms.state === "loading" || ms.state === "disabled") {
-    msg = `Loading local model (${ms.model})… first boot downloads ~1 GB`;
-    setTimeout(loadStatus, 3000); // poll while it loads
+    msg = `Loading local model (${ms.model})... first boot downloads about 1 GB`;
+    setTimeout(loadStatus, 3000);
   } else if (ms.state === "error") {
-    msg = `Model unavailable (${ms.error || "load failed"}) — using deterministic verifier`;
+    msg = `Model unavailable (${ms.error || "load failed"}) / deterministic verifier`;
   }
   $("#status").innerHTML = `<span class="dot ${dot}"></span>${msg}${corpus}`;
 
@@ -32,7 +32,8 @@ async function loadDemos() {
   const box = $("#demos");
   box.innerHTML = "";
   demos.forEach(d => {
-    const el = document.createElement("div");
+    const el = document.createElement("button");
+    el.type = "button";
     el.className = "demo";
     el.textContent = d.question;
     el.title = d.note;
@@ -52,7 +53,7 @@ async function verify() {
   const use_llm = $("#usellm").checked;
   if (!answer) { $("#vstatus").textContent = "Enter an answer to verify."; return; }
 
-  $("#vstatus").textContent = "Verifying…";
+  $("#vstatus").textContent = "Verifying...";
   const res = await api("/api/verify", {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ question, answer, use_llm_decompose: use_llm }),
@@ -68,11 +69,11 @@ function render(res) {
   const s = res.summary;
 
   let html = `<div class="scorebar">
-    <span class="pill s">✓ ${s.supported} supported</span>
-    <span class="pill r">✗ ${s.refuted} refuted</span>
-    <span class="pill u">⚠ ${s.unsupported} withheld</span>
-    <span class="pill trust">trust score ${s.trust_score}</span>
-    ${res.recheck_passed ? '<span class="pill recheck">⟳ proof re-checks</span>' : ''}
+    <span class="pill s">OK ${s.supported} supported</span>
+    <span class="pill r">NO ${s.refuted} refuted</span>
+    <span class="pill u">HOLD ${s.unsupported} withheld</span>
+    <span class="pill trust">trust ${s.trust_score}</span>
+    ${res.recheck_passed ? '<span class="pill recheck">proof re-checks</span>' : ''}
   </div>`;
 
   res.claims.forEach(c => {
@@ -88,7 +89,7 @@ function render(res) {
   });
 
   html += `<div class="verified">
-    <h4>Verified answer (supported claims only)</h4>
+    <h4>Verified answer / supported claims only</h4>
     <p>${esc(res.verified_answer)}</p>
   </div>`;
 
@@ -97,9 +98,9 @@ function render(res) {
 
 function evidence(ev, cls, label) {
   return `<div class="evidence ${cls}">
-    <div class="ev-label">${label} · score ${ev.score}</div>
-    <div class="quote">“${esc(ev.sentence)}”</div>
-    <a href="${esc(ev.source)}" target="_blank" rel="noopener">${esc(ev.title)} ↗</a>
+    <div class="ev-label">${label} / score ${ev.score}</div>
+    <div class="quote">"${esc(ev.sentence)}"</div>
+    <a href="${esc(ev.source)}" target="_blank" rel="noopener">${esc(ev.title)} -></a>
   </div>`;
 }
 
