@@ -1,0 +1,10 @@
+# Prebuilt CPU wheels for llama-cpp-python (no compiler needed on Railway).
+--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
+
+Flask>=3.0.0
+gunicorn>=21.2.0
+
+# Local small-model generator (CPU-only). The app still runs fully offline
+# (deterministic verifier) if these fail to install — imports are guarded.
+llama-cpp-python>=0.3.2
+huggingface_hub>=0.24.0

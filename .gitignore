@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+# Local model cache (GGUF files are large — never commit them)
+*.gguf
+.cache/
+models/
