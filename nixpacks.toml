@@ -1,0 +1,5 @@
+# Railway / Nixpacks build config.
+# The prebuilt CPU wheel for llama-cpp-python links against the OpenMP runtime
+# (libgomp.so.1), which isn't in the base runtime image. Install it via apt.
+[phases.setup]
+aptPkgs = ["...", "libgomp1"]

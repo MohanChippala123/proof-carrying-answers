@@ -162,6 +162,21 @@ def predicate_tokens(text: str, ents: set) -> set:
     return {t for t in content_tokens(text) if t not in ents}
 
 
+def multi_entity_tokens(text: str) -> set:
+    """Content tokens from MULTI-WORD capitalized spans only (person/org names).
+
+    Single-word capitalized tokens like 'Physics' or 'Nobel' are award/topic
+    labels, not subject identifiers.  Using only multi-word spans for the
+    subject-overlap check prevents an award shared between two different people
+    ('Nobel Prize') from falsely unifying their subjects.
+    """
+    result: set = set()
+    for m in _ENTITY.findall(text):
+        if len(m.split()) >= 2:
+            result.update(content_tokens(m))
+    return result
+
+
 def _jaccard(a: set, b: set) -> float:
     if not a or not b:
         return 0.0
@@ -301,6 +316,8 @@ def verify_claim(claim: str, evidence: List[EvidenceSpan],
     cv = salient_values(claim)
     cneg = has_negation(claim)
     cpred = predicate_tokens(claim, cv["ents"])
+    # Multi-word entity set for subject overlap (person/org names only).
+    cv_subj = multi_entity_tokens(claim)
 
     best_support: Optional[EvidenceSpan] = None
     best_support_score = 0.0
@@ -318,9 +335,17 @@ def verify_claim(claim: str, evidence: List[EvidenceSpan],
         # the evidence shares the claim's SUBJECT (entities) and PREDICATE
         # (the relation being asserted). This is what stops a different fact
         # with a different year from masquerading as a refutation.
-        subj = None if not cv["ents"] else len(cv["ents"] & ev_vals["ents"]) / len(cv["ents"])
+        # Subject overlap: prefer multi-word spans (person/org names); fall back
+        # to all entity tokens if the claim has no multi-word entities.
+        ev_subj = multi_entity_tokens(ev.sentence)
+        if cv_subj:
+            subj = len(cv_subj & ev_subj) / len(cv_subj)
+        else:
+            subj = None if not cv["ents"] else len(cv["ents"] & ev_vals["ents"]) / len(cv["ents"])
         pred_ov = _jaccard(cpred, epred)
-        same_subject = (subj is None) or (subj >= 0.5)
+        # Strictly > 0.5 so a shared award entity ('Nobel Prize') alone doesn't
+        # falsely unify subjects from different people.
+        same_subject = (subj is None) or (subj > 0.5)
 
         year_conflict = (cv["years"] and ev_vals["years"]
                          and not (cv["years"] & ev_vals["years"]))

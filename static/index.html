@@ -49,18 +49,75 @@
     <label class="field-label">Candidate answer to verify</label>
     <textarea id="answer" rows="4" placeholder="Paste an AI answer here..."></textarea>
 
+    <details class="compare-box">
+      <summary>Compare against another answer</summary>
+      <label class="field-label">Second candidate answer</label>
+      <textarea id="answerB" rows="4" placeholder="Paste a second answer to rank both by proof quality..."></textarea>
+    </details>
+
     <div class="actions">
-      <button id="verify" class="primary">Verify proof</button>
-      <label class="toggle"><input type="checkbox" id="usellm" /> Use Claude to decompose claims</label>
+      <button id="verify" class="primary">Verify proof <kbd class="kbd">⌘↵</kbd></button>
+      <button id="compare" class="secondary" type="button">Compare answers</button>
+      <button id="clear" class="secondary" type="button">Clear</button>
+      <label class="toggle"><input type="checkbox" id="streamMode" checked /> Stream live</label>
+      <label class="toggle"><input type="checkbox" id="usellm" /> Use local model</label>
       <span id="vstatus" class="status"></span>
     </div>
 
     <div id="result" class="result hidden"></div>
   </section>
 
+  <section class="tool-grid" aria-label="Verification tools">
+    <div class="side-panel">
+      <div class="section-heading compact">
+        <p class="kicker">02 / Corpus</p>
+        <h2>Add evidence</h2>
+        <p class="sub">Drop in a source note and the verifier will rebuild its live evidence index for this session.</p>
+      </div>
+
+      <label class="field-label">Source title</label>
+      <input type="text" id="sourceTitle" placeholder="e.g. Internal policy memo" />
+
+      <label class="field-label">Source URL or label</label>
+      <input type="text" id="sourceUrl" placeholder="https://example.com/source" />
+
+      <label class="field-label">Evidence text</label>
+      <textarea id="sourceText" rows="5" placeholder="Paste source text here..."></textarea>
+
+      <div class="actions">
+        <button id="addSource" class="secondary" type="button">Add source</button>
+        <button id="resetCorpus" class="secondary" type="button">Reset corpus</button>
+        <span id="sourceStatus" class="status"></span>
+      </div>
+
+      <div class="wiki-fetch">
+        <label class="field-label">Fetch Wikipedia evidence</label>
+        <p class="sub" style="margin-bottom:9px;">Pull any Wikipedia article into the live corpus — then verify claims about that topic.</p>
+        <div class="wiki-row">
+          <input type="text" id="wikiQuery" placeholder="Search term or paste a Wikipedia URL…" />
+          <button id="fetchWiki" class="secondary" type="button">Fetch</button>
+        </div>
+        <span id="wikiStatus" class="status"></span>
+      </div>
+
+      <div id="corpusList" class="corpus-list"></div>
+    </div>
+
+    <div class="side-panel">
+      <div class="section-heading compact">
+        <p class="kicker">03 / Session</p>
+        <h2>Verification history</h2>
+        <p class="sub">Recent checks stay here while the page is open, so you can compare trust scores and reopen a run.</p>
+      </div>
+      <div id="history" class="history empty">No runs yet.</div>
+    </div>
+  </section>
+
+  <section id="compareResult" class="comparison hidden"></section>
+
   <section class="thesis">
     <div class="section-heading compact">
-      <p class="kicker">02 / Thesis</p>
+      <p class="kicker">04 / Thesis</p>
       <h2>Why this is zero-to-one</h2>
     </div>
     <div class="cols">
